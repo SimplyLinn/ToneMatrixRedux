@@ -1,21 +1,30 @@
 {
   "name": "@simplylinn/tonematrix",
-  "version": "1.0.0",
-  "license": "GPLv3",
+  "version": "1.0.0-dev1",
+  "license": "GPL-3.0-or-later",
   "main": "dist/index.js",
   "unpkg": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "browser": true,
   "scripts": {
-    "dev": "cross-env webpack --watch",
-    "build": "cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production webpack",
-    "docs": "typedoc",
-    "start": "cross-env NODE_ENV=production next start",
-    "export": "cross-env NODE_ENV=production rimraf dist && cross-env NODE_ENV=production next export -o dist"
+    "watch": "webpack --watch",
+    "build": "tsc && webpack",
+    "dev:watch": "cross-env NODE_ENV=development webpack --watch",
+    "dev:build": "cross-env NODE_ENV=development tsc && cross-env NODE_ENV=development webpack",
+    "prod:watch": "cross-env NODE_ENV=production webpack --watch",
+    "prod:build": "cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production webpack",
+    "prepack": "rimraf dist docs && cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production webpack && typedoc",
+    "docs": "typedoc"
   },
   "repository": "github:SimplyLinn/ToneMatrixRedux",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "files": [
-    "dist"
+    "dist/**/*",
+    "docs/**/*",
+    "AUTHORS"
   ],
   "directories": {
     "lib": "dist"
@@ -31,6 +40,7 @@
     "eslint": "^7.1.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.20.2",
+    "rimraf": "^3.0.2",
     "ts-loader": "^8.0.2",
     "typedoc": "^0.17.0-3",
     "typescript": "^3.9.7",
