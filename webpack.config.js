@@ -1,12 +1,18 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+
+const isDev = process.env.NODE_ENV !== 'production';
+
+if (isDev) process.env.NODE_ENV = 'development';
 
 module.exports = {
   entry: './src/index.ts',
+  devtool: isDev ? 'inline-source-map' : 'source-map',
+  mode: isDev ? 'development' : 'production',
   output: {
     library: 'ToneMatrixLib',
     libraryTarget: 'umd',
-    filename: 'tonematrix.browser.bundle.js',
+    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {

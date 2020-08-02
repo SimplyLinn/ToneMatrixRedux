@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=530, user-scalable=no">
+	<title>ToneMatrix Redux - No Flash Required</title>
+	<meta name="description" content="A pentatonic step sequencer. Click tiles and make music.">
+	<meta name="author" content="Maximillian Laumeister">
+	<link rel="canonical" href="https://www.maxlaumeister.com/tonematrix/">
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+	<link rel="manifest" href="site.webmanifest">
+	<link rel="mask-icon" href="safari-pinned-tab.svg" color="#000668">
+	<meta name="apple-mobile-web-app-title" content="ToneMatrix">
+	<meta name="application-name" content="ToneMatrix">
+	<meta name="msapplication-TileColor" content="#000000">
+	<meta name="theme-color" content="#000000">
+	<script>
+	// If there is no trailing slash after the path in the url, add it
+	// Workaround for Netlify trailing-slash rewrite issue
+	// https://community.netlify.com/t/bug-in-non-trailing-slash-rewrite/452/23
+	if (!window.location.pathname.endsWith('/') && !window.location.pathname.split("/").pop().includes(".")) {
+		var url = window.location.protocol + '//' +
+			window.location.host +
+			window.location.pathname + '/' +
+			window.location.search;
+			window.history.replaceState(null, document.title, url);
+	}
+	</script>
+	<style>
+		@font-face {
+			font-family: 'Montserrat';
+			src: url('montserrat-thin-webfont.woff2') format('woff2');
+			font-weight: 100;
+			font-style: normal;
+			font-display: block;
+		}
+	</style>
+	<link rel="stylesheet" href="style.css">
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-24440376-11"></script>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-24440376-11');
+	</script>
+  </head>
+  <body>
+	<h1>ToneMatrix Redux</h1>
+	<p>A pentatonic step sequencer. Click tiles and make music.</p>
+	<p class="share-wrap">
+		Share Your Song: <input readonly id="clipboard-input"><button class="clipboard" data-clipboard-target="#clipboard-input"><img class="icon" src="clippy.svg" alt="Copy to clipboard"></button>
+	</p>
+	<div class="canvaswrap">
+		<div class="overlay"></div>
+		<a class="play-btn" href="javascript:void(0)"></a>
+	</div>
+	<p><span id="muteButton"></span><a id="clearnotes" class="button" href="javascript:void(0)">Clear Notes</a> Based on <a href="https://tonematrix.audiotool.com/">ToneMatrix</a> - By <a href="https://www.maxlaumeister.com/">Max L</a> - <a href="https://github.com/MaxLaumeister/ToneMatrixRedux">GitHub</a></p>
+	<script src="all.js"></script>
+	<script>
+		const toneMatrixInstance = new ToneMatrixLib.ToneMatrix(document.querySelector(".canvaswrap"));
+		// document.querySelector("#clearnotes"), document.querySelector("#clipboard-input"), document.querySelector(".clipboard"), document.querySelector("#muteButton")
+	</script>
+  </body>
+</html>

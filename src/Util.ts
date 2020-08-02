@@ -66,11 +66,11 @@ export default class Util {
   }
 
   private static devicePixelRatio = (function initPixelRatio() {
-    const mqString = `(resolution: ${globalThis.devicePixelRatio}dppx)`;
+    const mqString = `(resolution: ${window.devicePixelRatio}dppx)`;
     const updatePixelRatio = () => {
       Util.devicePixelRatio = window.devicePixelRatio || 1;
     };
-    globalThis
+    window
       .matchMedia(mqString)
       .addEventListener('change', updatePixelRatio);
     return window.devicePixelRatio || 1;
