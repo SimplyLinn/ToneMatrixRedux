@@ -1,40 +1,5 @@
-/* eslint-disable import/prefer-default-export */
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export interface Listener<EventMap extends {}, P extends keyof EventMap | string = string> {
-  readonly target: {
-      readonly on: (
-        event: P extends keyof EventMap ? P : string,
-        listener: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void,
-      ) => void;
-      readonly off: (
-        event: P extends keyof EventMap ? P : string,
-        listener: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void,
-      ) => void;
-    } | {
-      readonly addListener: (
-        event: P extends keyof EventMap ? P : string,
-        listener: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void,
-      ) => void;
-      readonly removeListener: (
-        event: P extends keyof EventMap ? P : string,
-        listener: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void,
-      ) => void;
-    }
-    | { readonly addEventListener: (
-      event: P extends keyof EventMap ? P : string,
-      listener: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void,
-    ) => void;
-    readonly removeEventListener: (
-      event: P extends keyof EventMap ? P : string,
-      listener: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void,
-    ) => void;
-  };
-  readonly event: keyof(HTMLElementEventMap & IGridRendererEventMap);
-  readonly cb: P extends keyof EventMap ? ((ev: EventMap[P]) => void) : (...args: any[]) => void
-}
-/* eslint-enable @typescript-eslint/no-explicit-any */
+import { Listener } from './InternalTypes';
+import { GridRendererEventMap } from './Types';
 
 export interface ITile {
   isEmpty(): boolean;
@@ -104,29 +69,14 @@ export interface IGrid {
   dispose?(): void
 }
 
-export type IGridRendererEventMap = {
-  tiledown: {
-    x: number, y: number,
-  };
-  tilemove: {
-    x: number, y: number,
-  };
-  tileup: {
-    x: number, y: number,
-  } | false;
-  tileclick: {
-    x: number, y: number,
-  };
-};
-
 export interface IGridRenderer {
 
-  on<P extends keyof IGridRendererEventMap | string, C = unknown>(
-    event: P, listener: Listener<IGridRendererEventMap, P>['cb'], context?: C
+  on<P extends keyof GridRendererEventMap | string, C = unknown>(
+    event: P, listener: Listener<GridRendererEventMap, P>['cb'], context?: C
   ): this;
 
-  off<P extends keyof IGridRendererEventMap | string, C = unknown>(
-    event: P, listener: Listener<IGridRendererEventMap, P>['cb'], context?: C
+  off<P extends keyof GridRendererEventMap | string, C = unknown>(
+    event: P, listener: Listener<GridRendererEventMap, P>['cb'], context?: C
   ): this;
   /**
    * Update, then draw the current state of the app to the canvas element.

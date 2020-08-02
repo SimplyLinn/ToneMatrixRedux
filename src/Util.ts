@@ -1,15 +1,5 @@
 /** A static class that provides pure functions */
 
-export type RecursivePartial<T> = {
-  [P in keyof T]?:
-    | (T[P] extends (infer U)[]
-        ? RecursivePartial<U>[]
-        : T[P] extends Record<string | number | symbol, unknown>
-        ? RecursivePartial<T[P]>
-        : T[P])
-    | undefined;
-};
-
 export default class Util {
   static DEBUG = false;
 

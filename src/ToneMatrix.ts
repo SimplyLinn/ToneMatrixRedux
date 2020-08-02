@@ -1,8 +1,8 @@
 import * as Tone from 'tone';
 import Grid from './Grid';
-import {
-  IGrid, IGridRenderer, IGridRendererEventMap, Listener,
-} from './Interfaces';
+import { IGrid, IGridRenderer } from './Interfaces';
+import { Listener } from './InternalTypes';
+import { GridRendererEventMap } from './Types';
 import GridCanvasRenderer from './GridCanvasRenderer';
 import Util from './Util';
 
@@ -26,7 +26,7 @@ export default class ToneMatrix {
   private HEIGHT: number;
   public readonly grid: IGrid;
   public readonly renderer: IGridRenderer;
-  private listeners: Listener<(HTMLElementEventMap & IGridRendererEventMap)>[] = [];
+  private listeners: Listener<(HTMLElementEventMap & GridRendererEventMap)>[] = [];
   private destroyed = false;
 
   /**
@@ -189,7 +189,6 @@ export default class ToneMatrix {
       // Invalid hash
     }
   }
-
 
   /**
    * Cleans up all resources used by this ToneMatrix

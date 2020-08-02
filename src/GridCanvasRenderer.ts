@@ -2,9 +2,9 @@ import { EventEmitter } from 'eventemitter3';
 import SpriteSheet from './SpriteSheet';
 import ParticleSystem from './ParticleSystem';
 import Util from './Util';
-import {
-  IGridRenderer, IGrid, Listener, IGridRendererEventMap,
-} from './Interfaces';
+import { IGridRenderer, IGrid } from './Interfaces';
+import { GridRendererEventMap } from './Types';
+import { Listener } from './InternalTypes';
 
 /** Renders a Grid to a canvas element */
 export default class GridCanvasRenderer extends EventEmitter implements IGridRenderer {
@@ -95,7 +95,7 @@ export default class GridCanvasRenderer extends EventEmitter implements IGridRen
 
   on(
     event: string | symbol,
-    listener: Listener<IGridRendererEventMap>['cb'],
+    listener: Listener<GridRendererEventMap>['cb'],
   ): this;
 
   on(event: string | symbol, listener: (...args: unknown[]) => void): this {
@@ -104,7 +104,7 @@ export default class GridCanvasRenderer extends EventEmitter implements IGridRen
 
   off(
     event: string | symbol,
-    listener: Listener<IGridRendererEventMap>['cb'],
+    listener: Listener<GridRendererEventMap>['cb'],
   ): this;
 
   off(event: string | symbol, listener: (...args: unknown[]) => void): this {

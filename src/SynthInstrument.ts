@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
-import Util, { RecursivePartial } from './Util';
+import Util from './Util';
+import { RecursivePartial } from './Types';
 
 /** Allows the audio playback of notes */
 export default class SynthInstrument {

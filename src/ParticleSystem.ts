@@ -1,12 +1,4 @@
-/** A particle system which contains particles that update themselves */
-
-export type Particle = {
-  life: number;
-  x: number;
-  vx: number;
-  y: number;
-  vy: number;
-};
+import { Particle } from './Types';
 
 function buildParticleObject(): Particle {
   return {
@@ -18,6 +10,7 @@ function buildParticleObject(): Particle {
   };
 }
 
+/** A particle system which contains particles that update themselves */
 export default class ParticleSystem {
   public readonly PARTICLE_POOL_SIZE = 2000;
   public readonly PARTICLE_LIFETIME = 40;
