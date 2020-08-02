@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="./dist/tonematrix.browser.bundle.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      new ToneMatrixLib.ToneMatrix(document.getElementById('matrix'));
+    })
+  </script>
+  <style>
+    #matrix > canvas {
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+  TEST
+  <div id="matrix"></div>
+</body>

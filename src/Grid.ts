@@ -1,24 +1,34 @@
-/* global GridRenderer */
-/* global SynthInstrument */
-/* global Util */
-/* global Tile */
-/* global Tone */
+import * as Tone from 'tone';
+import Util from './Util';
+import SynthInstrument from './SynthInstrument';
+import Tile from './Tile';
+import { IGrid, ITile } from './Interfaces';
+
 /** A 2-D matrix that keeps track of notes and can enable, disable, and play them */
-class Grid { // eslint-disable-line no-unused-vars
+export default class Grid implements IGrid {
+  public readonly data: readonly ITile[];
+  /**
+   * The width of the grid in tiles
+   */
+  public readonly width: number;
+  /**
+   * The height of the grid in tiles
+   */
+  public readonly height: number;
+  public readonly currentInstrument = 0;
+  private instruments: SynthInstrument[] = [];
+
   /**
    * Creates a new Grid
-   * @param {number} width - The width of the grid in tiles
-   * @param {number} height  - The height of the grid in tiles
-   * @param {Canvas} canvas - The canvas DOM element that the grid should draw to
+   * @param width - The width of the grid in tiles
+   * @param height  - The height of the grid in tiles
+   * @param renderer - The renderer to use to render the grid
    */
-  constructor(width, height, canvas) {
-    Util.assert(arguments.length === 3);
-    this.data = Array(width * height).fill().map(() => (new Tile()));
+  constructor(width: number, height: number) {
+    this.data = Array.from({ length: width * height }, () => new Tile());
     this.width = width;
     this.height = height;
-    this.renderer = new GridRenderer(width, height, canvas);
     this.currentInstrument = 0;
-    this.instruments = [];
     this.instruments.push(new SynthInstrument(width, height, {
       oscillator: {
         type: 'sine',
@@ -51,35 +61,27 @@ class Grid { // eslint-disable-line no-unused-vars
     }));
   }
 
-  /**
-   * Updates and draws the grid to the canvas
-   * @param {number} mouseX - The current x position of the mouse on the canvas element
-   * @param {number} mouseY - The current y position of the mouse on the canvas element
-   */
-  update(mouseX, mouseY) {
-    Util.assert(arguments.length === 2);
-    this.renderer.update(this, mouseX, mouseY);
+  getPlayheadX(): number {
+    return this.instruments[this.currentInstrument].getPlayheadX();
   }
 
   /**
    * Gets whether a grid tile is currently lit up (armed)
-   * @param {number} x - The x position, measured in grid tiles
-   * @param {number} y - The y position, measured in grid tiles
-   * @returns {bool} - Whether the tile is lit up
+   * @param x - The x position, measured in grid tiles
+   * @param y - The y position, measured in grid tiles
+   * @returns Whether the tile is lit up
    */
-  getTileValue(x, y) {
-    Util.assert(arguments.length === 2);
+  getTileValue(x: number, y: number): boolean {
     return this.data[Util.coordToIndex(x, y, this.height)].hasNote(this.currentInstrument);
   }
 
   /**
    * Sets whether a grid tile is currently lit up (armed)
-   * @param {number} x - The x position, measured in grid tiles
-   * @param {number} y - The y position, measured in grid tiles
-   * @param {bool} - Whether the tile should be turned on (true) or off (false)
+   * @param x - The x position, measured in grid tiles
+   * @param y - The y position, measured in grid tiles
+   * @param bool - Whether the tile should be turned on (true) or off (false)
    */
-  setTileValue(x, y, bool) {
-    Util.assert(arguments.length === 3);
+  setTileValue(x: number, y: number, bool: boolean): void {
     if (bool) {
       if (this.getTileValue(x, y)) return;
       // Turning on, schedule note
@@ -99,49 +101,46 @@ class Grid { // eslint-disable-line no-unused-vars
 
   /**
    * Toggles whether a grid tile is currently lit up (armed)
-   * @param {number} x - The x position, measured in grid tiles
-   * @param {number} y - The y position, measured in grid tiles
+   * @param x - The x position, measured in grid tiles
+   * @param y - The y position, measured in grid tiles
    */
-  toggleTileValue(x, y) {
-    Util.assert(arguments.length === 2);
+  toggleTileValue(x: number, y: number): void {
     this.setTileValue(x, y, !this.getTileValue(x, y));
   }
 
   /**
    * Turns off all tiles and removes all notes
    */
-  clearAllTiles() {
-    Util.assert(arguments.length === 0);
+  clearAllTiles(): void {
     this.data.forEach((e) => e.removeAllNotes());
+    this.instruments.forEach((inst) => inst.clearNotes());
     Tone.Transport.cancel();
   }
 
-  setCurrentInstrument(instrumentId) {
+  setCurrentInstrument(instrumentId: number): void {
     if (instrumentId >= this.instruments.length) {
       // eslint-disable-next-line no-console
       console.warn('tried to switch to nonexistent instrument');
     } else {
-      this.currentInstrument = instrumentId;
+      (this.currentInstrument as number) = instrumentId;
     }
   }
 
   /**
    * Sets whether the ToneMatrix grid is muted.
-   * @param {boolean} muted - True for muted, false for unmuted
+   * @param muted - True for muted, false for unmuted
    */
   // eslint-disable-next-line class-methods-use-this
-  setMuted(muted) {
-    Util.assert(arguments.length === 1);
+  setMuted(muted: boolean): void {
     Tone.Destination.mute = muted;
   }
 
   /**
    * Saves the grid's current state into a savestate string
-   * @returns {string} savestate - The base64-encoded URL-encoded savestate string,
+   * @returns The base64-encoded URL-encoded savestate string,
    *   ready for saving or outputting in a URL
    */
-  toBase64() {
-    Util.assert(arguments.length === 0);
+  toBase64(): string {
     let dataflag = false;
     const bytes = new Uint8Array(this.data.length / 8);
     for (let i = 0; i < this.data.length / 8; i += 1) {
@@ -171,10 +170,9 @@ class Grid { // eslint-disable-line no-unused-vars
 
   /**
    * Loads a savestate from a string into the grid
-   * @param {string} savestate - The base64-encoded URL-encoded savestate string
+   * @param base64enc - The base64-encoded URL-encoded savestate string
    */
-  fromBase64(base64enc) {
-    Util.assert(arguments.length === 1);
+  fromBase64(base64enc: string): void {
     try {
       const base64 = decodeURIComponent(base64enc);
       const binary = atob(base64);
@@ -196,5 +194,15 @@ class Grid { // eslint-disable-line no-unused-vars
     } catch (e) {
       // Invalid hash
     }
+  }
+
+  /**
+   * Dispose of all resources used by this grid object.
+   */
+  dispose(): void {
+    Tone.Transport.cancel();
+    this.instruments.forEach((inst) => inst.dispose());
+    (this.data as Tile[]).length = 0;
+    this.instruments.length = 0;
   }
 }

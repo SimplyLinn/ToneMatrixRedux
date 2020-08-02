@@ -1,38 +1,53 @@
-/* global Util */
 /** A particle system which contains particles that update themselves */
-class ParticleSystem { // eslint-disable-line no-unused-vars
-  /**
-   * @param {number} width - Height of the particle system, typically in pixels
-   * @param {number} height - Width of the particle system, typically in pixels
-   */
-  constructor(width, height) {
-    Util.assert(arguments.length === 2);
-    this.PARTICLE_POOL_SIZE = 2000;
-    this.PARTICLE_LIFETIME = 40;
 
+export type Particle = {
+  life: number;
+  x: number;
+  vx: number;
+  y: number;
+  vy: number;
+};
+
+function buildParticleObject(): Particle {
+  return {
+    life: 0,
+    x: 0,
+    vx: 0,
+    y: 0,
+    vy: 0,
+  };
+}
+
+export default class ParticleSystem {
+  public readonly PARTICLE_POOL_SIZE = 2000;
+  public readonly PARTICLE_LIFETIME = 40;
+  private width: number;
+  private height: number
+  private oldestParticle = 0;
+  private lastUpdate = 0;
+  public readonly particles: readonly Readonly<Particle>[];
+
+  /**
+   * @param width - Height of the particle system, typically in pixels
+   * @param height - Width of the particle system, typically in pixels
+   */
+  constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
 
-    this.oldestParticle = 0;
-    this.lastUpdate = 0;
-
-    this.particles = new Array(this.PARTICLE_POOL_SIZE);
-    for (let i = 0; i < this.PARTICLE_POOL_SIZE; i += 1) {
-      this.particles[i] = {};
-    }
+    this.particles = Array.from({ length: this.PARTICLE_POOL_SIZE }, buildParticleObject);
   }
 
   /**
    * Updates all particle positions based on their current position,
    * velocity, and the amount of time that's passed.
    */
-  update() {
-    Util.assert(arguments.length === 0);
+  update(): void {
     if (this.lastUpdate !== 0) {
       const now = Date.now();
       const deltaTime = (now - this.lastUpdate) / 16.67; // 60fps is a time factor of 1
       for (let i = 0; i < this.PARTICLE_POOL_SIZE; i += 1) {
-        const p = this.particles[i];
+        const p = this.particles[i] as Particle;
         if (p.life > 0) {
           const pvx = p.vx * deltaTime;
           const pvy = p.vy * deltaTime;
@@ -59,14 +74,13 @@ class ParticleSystem { // eslint-disable-line no-unused-vars
 
   /**
    * Creates a new particle
-   * @param {number} x - Particle's x position, in pixels
-   * @param {number} y - Particle's y position, in pixels
-   * @param {number} vx - Particle's x velocity, in pixels per 1/60th of a second
-   * @param {number} vy - Particle's y velocity, in pixels per 1/60th of a second
+   * @param x - Particle's x position, in pixels
+   * @param y - Particle's y position, in pixels
+   * @param vx - Particle's x velocity, in pixels per 1/60th of a second
+   * @param vy - Particle's y velocity, in pixels per 1/60th of a second
    */
-  createParticle(x, y, vx, vy) {
-    Util.assert(arguments.length === 4);
-    const p = this.particles[this.oldestParticle];
+  createParticle(x: number, y: number, vx: number, vy: number): void {
+    const p = this.particles[this.oldestParticle] as Particle;
     p.x = x;
     p.y = y;
     p.vx = vx;
@@ -78,12 +92,12 @@ class ParticleSystem { // eslint-disable-line no-unused-vars
 
   /**
    * Creates a burst of particles exploding out in a circle from a single point
-   * @param {number} x - The x coordinate of the emanation point
-   * @param {number} y - The y coordinate of the emanation point
-   * @param {number} v - The velocity of the particles, in pixels per 1/60th of a second
-   * @param {number} n - The number of particles to create
+   * @param x - The x coordinate of the emanation point
+   * @param y - The y coordinate of the emanation point
+   * @param v - The velocity of the particles, in pixels per 1/60th of a second
+   * @param n - The number of particles to create
    */
-  createParticleBurst(x, y, v, n) {
+  createParticleBurst(x: number, y: number, v: number, n: number): void {
     const randomOffset = Math.random() * 2 * Math.PI;
     for (let j = 0; j < 2 * Math.PI; j += (2 * Math.PI) / n) {
       const pvx = Math.cos(j + randomOffset) * v;
