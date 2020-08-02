@@ -4,6 +4,7 @@ import {
   IGrid, IGridRenderer, IGridRendererEventMap, Listener,
 } from './Interfaces';
 import GridCanvasRenderer from './GridCanvasRenderer';
+import Util from './Util';
 
 /** Main class of ToneMatrix Redux, a pentatonic step sequencer */
 export default class ToneMatrix {
@@ -23,8 +24,8 @@ export default class ToneMatrix {
    * The height of the grid, measured in grid tiles
    */
   private HEIGHT: number;
-  private grid: IGrid;
-  private renderer: IGridRenderer;
+  public readonly grid: IGrid;
+  public readonly renderer: IGridRenderer;
   private listeners: Listener<(HTMLElementEventMap & IGridRendererEventMap)>[] = [];
   private destroyed = false;
 
@@ -127,6 +128,68 @@ export default class ToneMatrix {
   setMuted(muted: boolean): void {
     this.grid.setMuted(muted);
   }
+
+  /**
+   * Saves the grid's current state into a savestate string
+   * @returns The base64-encoded URL-encoded savestate string,
+   *   ready for saving or outputting in a URL
+   */
+  toBase64(): string {
+    let dataflag = false;
+    const bytes = new Uint8Array(this.grid.data.length / 8);
+    for (let i = 0; i < this.grid.data.length / 8; i += 1) {
+      let str = '';
+      for (let j = 0; j < 8; j += 1) {
+        const tile = !this.grid.data[Util.coordToIndex(i, j, 8)].isEmpty();
+        if (tile) {
+          str += '1';
+          dataflag = true;
+        } else {
+          str += '0';
+        }
+      }
+      bytes[i] = parseInt(str, 2);
+    }
+    if (!dataflag) return '';
+
+    let binary = '';
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const base64 = btoa(binary);
+    const base64enc = encodeURIComponent(base64);
+    return base64enc;
+  }
+
+  /**
+   * Loads a savestate from a string into the grid
+   * @param base64enc - The base64-encoded URL-encoded savestate string
+   */
+  fromBase64(base64enc: string): void {
+    try {
+      const base64 = decodeURIComponent(base64enc);
+      const binary = atob(base64);
+
+      const bytes = new Uint8Array(this.grid.data.length / 8);
+      let str = '';
+      for (let i = 0; i < this.grid.data.length / 8; i += 1) {
+        const byte = binary.charCodeAt(i);
+        bytes[i] = byte;
+        let bits = byte.toString(2);
+        bits = bits.padStart(8, '0');
+        str += bits;
+      }
+
+      for (let i = 0; i < str.length; i += 1) {
+        const bool = str[i] === '1';
+        this.grid.setTileValue(Math.floor(i / this.grid.width), i % this.grid.width, bool);
+      }
+    } catch (e) {
+      // Invalid hash
+    }
+  }
+
 
   /**
    * Cleans up all resources used by this ToneMatrix
